@@ -129,8 +129,8 @@ map.on("load", () => {
 
     const props = feature.properties || {};
 
-    const title = props.title ?? "Story";
-    const date = props.date ?? "";
+    const title = decodeEntities(props.title ?? "Story");
+    const date  = decodeEntities(props.date ?? "");
     const url = props.url ?? "#";
 
     // Anti-meridian wrap fix
@@ -167,6 +167,13 @@ map.on("load", () => {
   map.on("mouseenter", "unclustered-point", () => (map.getCanvas().style.cursor = "pointer"));
   map.on("mouseleave", "unclustered-point", () => (map.getCanvas().style.cursor = ""));
 });
+
+function decodeEntities(str) {
+  if (str == null) return "";
+  const textarea = document.createElement("textarea");
+  textarea.innerHTML = String(str);
+  return textarea.value;
+}
 
 // =====================
 // Helpers (basic XSS-safe escaping)
