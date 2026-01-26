@@ -71,11 +71,11 @@ map.on("load", () => {
         ["get", "point_count"],
         "#76CABD",
         50,
-        "#549598",
-        200,
         "#336173",
-        1000,
+        200,
         "#112C4E",
+        1000,
+        "#000000",
       ],
       "circle-opacity": 0.85,
       "circle-stroke-width": 1,
@@ -84,6 +84,8 @@ map.on("load", () => {
   });
 
 // 112C4E 336173 549598 76CABD
+
+// 76CABD 549598 336173 112C4E
 
   map.addLayer({
     id: "cluster-count",
