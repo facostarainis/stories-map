@@ -69,11 +69,11 @@ map.on("load", () => {
       "circle-color": [
         "step",
         ["get", "point_count"],
-        "#2D76CF",
+        "#76CABD",
         50,
-        "#2663AD",
+        "#549598",
         200,
-        "#1E4F8B",
+        "#336173",
         1000,
         "#112C4E",
       ],
@@ -82,6 +82,8 @@ map.on("load", () => {
       "circle-stroke-color": "rgba(0,0,0,0.15)",
     },
   });
+
+// 112C4E 336173 549598 76CABD
 
   map.addLayer({
     id: "cluster-count",
