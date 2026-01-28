@@ -356,11 +356,15 @@ map.on("load", () => {
     const thumbBlock = isProbablyUrl(thumbnail) && isProbablyUrl(url)
       ? `
         <a class="popup-thumb" href="${escapeAttr(url)}" target="_blank" rel="noopener noreferrer">
-          <img src="${escapeAttr(thumbnail)}" alt="" loading="lazy" />
+          <img
+            src="${escapeAttr(thumbnail)}"
+            alt=""
+            loading="lazy"
+            decoding="async"
+          />
         </a>
       `
       : "";
-
 
     const popupHtml = `
       <div class="popup-date"><b>${escapeHtml(date)}</b></div>

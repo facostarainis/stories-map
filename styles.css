@@ -246,3 +246,39 @@ html, body {
 .mapboxgl-popup-tip {
   z-index: 9999;
 }
+
+/* =========================
+   Popup thumbnail placeholder 
+   ========================= */
+
+.popup-thumb {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+
+  /* soft neutral placeholder */
+  background: linear-gradient(
+    135deg,
+    #f1f1f1,
+    #e6e6e6
+  );
+
+  border-radius: 10px; /* matches popup style */
+}
+
+/* Image fades in smoothly when ready */
+.popup-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+
+  opacity: 0;
+  transition: opacity 0.25s ease-in;
+}
+
+/* When image is loaded / present */
+.popup-thumb img[src] {
+  opacity: 1;
+}
