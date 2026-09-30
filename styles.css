@@ -582,3 +582,9 @@ html, body {
   display: block;
   margin-bottom: 6px;
 }
+
+/* Hidden by the embed control API (storymap:setUI) */
+body[data-ui="hidden"] .map-overlay,
+body[data-ui="hidden"] .mapboxgl-ctrl-top-right {
+  display: none;
+}

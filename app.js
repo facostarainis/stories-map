@@ -648,6 +648,99 @@ if (!mapFailed && map) {
         .setHTML(popupHtml)
         .addTo(map);
     });
+
+    // ---------------------
+    // Embed control API (postMessage)
+    // ---------------------
+    // Lets a parent page (e.g. a scrollytelling page embedding this map in an
+    // iframe) drive the map. Does nothing unless a message is received.
+    // Messages look like: { type: "storymap:flyTo", center: [lon, lat], zoom: 4 }
+    // Supported types: flyTo, setFilter, setUI, setInteractive, closePopups.
+    // When ready, the map posts { type: "storymap:ready" } to the parent.
+    const ALLOWED_PARENT_HOSTS = [
+      /(^|\.)pulitzercenter\.org$/,
+      /\.pantheonsite\.io$/,
+      /^dare-pc\.github\.io$/,
+      /^facostarainis\.github\.io$/,
+      /^localhost$/,
+      /^127\.0\.0\.1$/,
+    ];
+    const interactionHandlers = [
+      "scrollZoom",
+      "boxZoom",
+      "dragRotate",
+      "dragPan",
+      "keyboard",
+      "doubleClickZoom",
+      "touchZoomRotate",
+    ];
+
+    function isAllowedParentOrigin(origin) {
+      try {
+        const host = new URL(origin).hostname;
+        return ALLOWED_PARENT_HOSTS.some((re) => re.test(host));
+      } catch {
+        return false;
+      }
+    }
+
+    function applyExternalFilter({ year, focus }) {
+      if (focus !== undefined) {
+        const nextFocus = FOCUS_OPTIONS.includes(focus) ? focus : "all";
+        setSourceToFocus(nextFocus);
+        renderFocusLabel(focusPickerLabel, nextFocus);
+        if (focusSelect) focusSelect.value = nextFocus;
+      }
+
+      if (year !== undefined) {
+        const nextYear = availableYears.includes(String(year)) ? String(year) : "all";
+        setSourceToYear(nextYear);
+        if (yearPickerLabel) yearPickerLabel.textContent = labelForValue(nextYear);
+        if (yearSelect) yearSelect.value = nextYear;
+      }
+    }
+
+    function handleExternalMessage(event) {
+      if (!isAllowedParentOrigin(event.origin)) return;
+
+      const msg = event.data;
+      if (!msg || typeof msg.type !== "string" || !msg.type.startsWith("storymap:")) {
+        return;
+      }
+
+      switch (msg.type) {
+        case "storymap:flyTo": {
+          const options = {};
+          if (Array.isArray(msg.center)) options.center = msg.center;
+          for (const key of ["zoom", "pitch", "bearing", "duration"]) {
+            if (typeof msg[key] === "number") options[key] = msg[key];
+          }
+          map.flyTo({ essential: true, ...options });
+          break;
+        }
+        case "storymap:setFilter":
+          applyExternalFilter(msg);
+          break;
+        case "storymap:setUI":
+          document.body.dataset.ui = msg.visible === false ? "hidden" : "visible";
+          break;
+        case "storymap:setInteractive":
+          for (const name of interactionHandlers) {
+            if (msg.enabled === false) map[name].disable();
+            else map[name].enable();
+          }
+          break;
+        case "storymap:closePopups":
+          document.querySelectorAll(".mapboxgl-popup").forEach((el) => el.remove());
+          break;
+      }
+    }
+
+    window.addEventListener("message", handleExternalMessage);
+
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: "storymap:ready" }, "*");
+    }
   });
 }
 
